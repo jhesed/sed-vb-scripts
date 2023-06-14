@@ -12,9 +12,9 @@ Dim StartArchive 'Starttime of Archiving
 Dim StopArchive 'Stoptime of Archiving
 Dim TimeStamp 'Timestamp for bulding filename
 
-' MsgBox "Setting StartArchive value..."
-StartArchive = "2023-06-13 00:00:000"
-StopArchive = "2023-06-13 23:59:000"
+'MsgBox "Setting StartArchive value..."
+StartArchive = "2023-06-14 00:00:000"
+StopArchive = "2023-06-14 23:59:000"
 
 ' MsgBox "Creating file..."
 'Path and name for the *.csv -File
@@ -112,7 +112,7 @@ CommandTextStart = "'0000-00-" & DurationDay & " " & DurationHour & ":" & Durati
 'MsgBox "Computing CommandTextStart..." &CommandTextStart
 'Building the complete String:
 'Pass these as parameters when we're ready
-Archivename = "Process Value Archive"
+Archivename = "Hourly"
 MeasuringPoint = "Flow"
  
 'MsgBox "Computing CommandText..."
@@ -129,6 +129,29 @@ Command.CommandText=CommandText
 Set RecSet = Command.Execute 
 
 RecSet.MoveFirst
+
+
+'Write CSV header    
+ts.WriteLine ("Tag-Name;ValueID;Date/Time;Process-Value")
+
+'Write all Flow data
+Do While Not RecSet.EOF 
+    ts.WriteLine (MeasuringPoint & ";" & RecSet.Fields("ValueID").Value & ";" & RecSet.Fields("TimeStamp").Value & ";" & RecSet.Fields("RealValue").Value) 
+    RecSet.MoveNext 
+Loop 
+
+' Close all
+ts.Close 
+RecSet.Close 
+Set ReCset=Nothing 
+Set Command = Nothing 
+conn.Close 					'Close connection 
+Set Conn = Nothing 
+Set fso = Nothing 
+Set f = Nothing 
+Set ts = Nothing 
+
+
 MsgBox "End of code..."
 
 End Function
