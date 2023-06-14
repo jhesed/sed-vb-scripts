@@ -1,3 +1,5 @@
+Option Explicit
+Function action
 
 ' =================================== OPEN CSV
 
@@ -58,7 +60,7 @@ Dim DurationSec 'Duration of Production-Cycle
 Dim DurationMin 'Duration of Production-Cycle 
 Dim DurationHour 'Duration of Production-Cycle 
 Dim DurationDay 'Duration of Production-Cycle 
-Dim Language 'Language tag
+Dim Language 'Language Tag
 Dim MeasuringPoint 'Measuring point
 Dim Archivename 'Archive name
 
@@ -113,16 +115,20 @@ CommandTextStart = "'0000-00-" & DurationDay & " " & DurationHour & ":" & Durati
 Archivename = "Process Value Archive"
 MeasuringPoint = "Flow"
  
-MsgBox "Computing CommandText..."
+'MsgBox "Computing CommandText..."
 CommandText="Tag:R,'" & Archivename & "\" & MeasuringPoint & "'," & CommandTextStart & ",'0000-00-00 00:00:00.000'" 
-'MsgBox "CommandText..." &CommandText
+MsgBox "CommandText..." &CommandText
 
 'Create the recordset, read the records and set to first ‘redcordset: 
 Set Command = CreateObject("ADODB.Command") 
 Command.CommandType = 1 
 Set Command.ActiveConnection = Conn 
-Command.CommandText=CommandText 
-Set RecSet = Command.Execute 
-RecSet.MoveFirst
 
+Command.CommandText=CommandText 
+
+Set RecSet = Command.Execute 
+
+RecSet.MoveFirst
 MsgBox "End of code..."
+
+End Function
