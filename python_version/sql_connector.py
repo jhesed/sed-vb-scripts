@@ -15,14 +15,28 @@ DurationMin = "30"
 DurationSec = "00"
 
 # Build CommandTextStart
-CommandTextStart = "'0000-00-" + DurationDay + " " + DurationHour + ":" + DurationMin + ":" + DurationSec + ".000'"
+# CommandTextStart = "'0000-00-" + DurationDay + " " + DurationHour + ":" + DurationMin + ":" + DurationSec + ".000'"
+CommandTextStart = "2023-06-16 11:00:00.000"
+CommandTextEnd = "2023-06-16 11:02:00.000"
 
+print(CommandTextStart)
 # Define variables
 Archivename = "Hourly"
 MeasuringPoint = "Flow"
 
 # Build CommandText
-CommandText = "Tag:R,'" + Archivename + "\\" + MeasuringPoint + "'," + CommandTextStart + ",'0000-00-00 00:00:00.000'"
+CommandText = (
+    "Tag:R,'"
+    + Archivename
+    + "\\"
+    + MeasuringPoint
+    + "',"
+    + CommandTextStart
+    + ",'0000-00-00 00:00:00.000'"
+)
+# CommandText = "Tag:R,'" + "Hourly\Flow,Power" + "'," + CommandTextStart + "," + CommandTextEnd
+# CommandText = "Tag:R,'" + Archivename + "\\" + MeasuringPoint + "'," + CommandTextStart + "," + CommandTextEnd + "UNION " + "Tag:R,'" + "Hourly\Power" + "'," + CommandTextStart + "," + CommandTextEnd
+
 
 print("CommandText: " + CommandText)
 
@@ -33,7 +47,8 @@ command.ActiveConnection = conn
 command.CommandText = CommandText
 
 # Execute the command and retrieve the recordset
-recSet = command.Execute()[0]
+recSet = command.Execute()
+recSet = recSet[0]
 field_names = [field.Name for field in recSet.Fields]
 
 while not recSet.EOF:
