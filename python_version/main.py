@@ -112,21 +112,19 @@ if __name__ == "__main__":
     time.sleep(DELAY)
 
     # Get current datetime in UTC (scada time)
-    current_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
+    end_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
 
-    # Get the minute after
-    end_datetime = current_datetime + timedelta(minutes=REPORT_RANGE_MINS)
+    # Get data from the past x minutes
+    start_datetime = end_datetime - timedelta(minutes=REPORT_RANGE_MINS)
 
     # Format the datetime strings
-    current_datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[
-        :-3
-    ]
+    start_datetime_str = start_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     end_datetime_str = end_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
     logger.info(
         {
             "msg": "Alive.",
-            "current_datetime_str": current_datetime_str,
+            "start_datetime_str": start_datetime_str,
             "end_datetime_str": end_datetime_str,
         }
     )
@@ -135,7 +133,7 @@ if __name__ == "__main__":
     result = scada_client(
         tags=TAGS,
         archive_name="Hourly",
-        start_datetime=current_datetime_str,
+        start_datetime=start_datetime_str,
         end_datetime=end_datetime_str,
     )
     logger.info({"msg": "Got data.", "data": result})
