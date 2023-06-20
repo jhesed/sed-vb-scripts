@@ -1,6 +1,7 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import pytz
 import win32com.client
 
 from python_version.config import CONN_STRING, DB_CONN_TYPE, DB_COMMAND, TAGS
@@ -69,7 +70,7 @@ class ScadaClient:
             )
 
             formatted_date = date_and_time_in_timezone.strftime(
-                "%Y-%m-%d %H:%M:%S.%f"
+                "%Y-%m-%d %H:%M:%S"
             )
 
             if formatted_date not in self.merged_result:
@@ -86,12 +87,27 @@ class ScadaClient:
 
 
 if __name__ == "__main__":
+    # Get current datetime in UTC (scada time)
+    current_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
+
+    # Get the minute after
+    next_minute = current_datetime + timedelta(minutes=1)
+
+    # Format the datetime strings
+    current_datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[
+        :-3
+    ]
+    next_minute_str = next_minute.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+    print(f"current_datetime_str: {current_datetime_str}")
+    print(f"next_minute_str: {next_minute_str}")
+
     scada_client = ScadaClient()
     result = scada_client(
         tags=TAGS,
         archive_name="Hourly",
-        start_datetime="2023-06-16 10:56:00.000",
-        end_datetime="2023-06-16 11:00:00.000",
+        start_datetime=current_datetime_str,
+        end_datetime=next_minute_str,
     )
     print(json.dumps(result, indent=2))
     scada_client.close_connection()
