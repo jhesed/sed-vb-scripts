@@ -21,3 +21,5 @@ REPORT_RANGE_MINS = 5
 
 # Assign unique value per plant!!!
 PLANT_ID = 1
+
+API_ENDPOINT = "http://localhost:8000/api"

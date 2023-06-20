@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import pytz
 import win32com.client
 
+from python_version.api import api_create_ops
+
 # Get the current script directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -49,7 +51,12 @@ class ScadaClient:
                 self.build_command()
                 result = self.get_values(tag=tag)
 
-            return self.listify_dict(result)
+            listified = self.listify_dict(result)
+            api_response = api_create_ops(data_list=listified)
+            logger.info(
+                {"msg": "Got API response", "api_response": api_response}
+            )
+            return listified
         except Exception as exc:
             logger.exception({"msg": f"Got unexpected error: {str(exc)}"})
 
@@ -107,7 +114,6 @@ class ScadaClient:
         rect_set = rect_set[0]
         while not rect_set.EOF:
             # Convert to correct timezone
-            date_and_time = rect_set.Fields("Timestamp").Value
             date_and_time_in_timezone = datetime.fromtimestamp(
                 rect_set.Fields("Timestamp").Value.timestamp()
             )
