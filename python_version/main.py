@@ -21,6 +21,7 @@ from python_version.config import (
     DB_COMMAND,
     TAGS,
     DELAY,
+    REPORT_RANGE_MINS,
 )
 from python_version.logger import instantiate_logger
 
@@ -114,19 +115,19 @@ if __name__ == "__main__":
     current_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
 
     # Get the minute after
-    next_minute = current_datetime + timedelta(minutes=1)
+    end_datetime = current_datetime + timedelta(minutes=REPORT_RANGE_MINS)
 
     # Format the datetime strings
     current_datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[
         :-3
     ]
-    next_minute_str = next_minute.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    end_datetime_str = end_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
     logger.info(
         {
             "msg": "Alive.",
             "current_datetime_str": current_datetime_str,
-            "next_minute_str": next_minute_str,
+            "end_datetime_str": end_datetime_str,
         }
     )
 
@@ -135,7 +136,7 @@ if __name__ == "__main__":
         tags=TAGS,
         archive_name="Hourly",
         start_datetime=current_datetime_str,
-        end_datetime=next_minute_str,
+        end_datetime=end_datetime_str,
     )
     logger.info({"msg": "Got data.", "data": result})
     scada_client.close_connection()

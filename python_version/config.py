@@ -15,3 +15,6 @@ BACKUP_COUNT = 5  # Number of backup log files to keep
 # We want to add delay before we run our app, so that scada already generated the data we need
 # on that particular minute
 DELAY = int(os.getenv("DELAY", 1))
+
+# Used for end datetime of report
+REPORT_RANGE_MINS = 5
