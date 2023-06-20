@@ -8,7 +8,7 @@ DB_COMMAND = "ADODB.Command"
 TAGS = ["Power", "Flow", "Pressure", "Level"]
 
 # Configure logging
-LOG_FILE_NAME = "pl-data-miner.log"
+LOG_FILE_NAME = "C:\\Users\\Dell\\OneDrive\\Documents\\sed\\workspace\\sed-vb-scripts\\python_version\\pl-data-miner.log"
 BACKUP_COUNT = 5  # Number of backup log files to keep
 
 # Sleep time before app starts.

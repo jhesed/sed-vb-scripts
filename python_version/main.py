@@ -1,8 +1,19 @@
+import os
+import sys
 import time
 from datetime import datetime, timedelta
 
 import pytz
 import win32com.client
+
+# Get the current script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Get the parent directory of the script directory
+parent_dir = os.path.dirname(script_dir)
+
+# Add the parent directory to the Python path
+sys.path.append(parent_dir)
 
 from python_version.config import (
     CONN_STRING,
