@@ -36,3 +36,31 @@ With these modifications, the task will run every minute, but it will be delayed
 Make sure your Python script contains the desired functionality to execute at that interval, in this case, obtaining the current datetime and the minute after.
 
 Please note that these instructions are based on Windows 10. The steps might vary slightly if you are using a different version of Windows.
+
+To activate a virtual environment (venv) for the Python script executed by the Task Scheduler, you need to specify the full path to the Python interpreter within the virtual environment. Here's how you can activate the venv for your script:
+
+1. Open the Task Scheduler.
+2. Locate the task that runs your Python script.
+3. Right-click on the task and select "Properties" from the context menu.
+4. In the "Actions" tab, select the action that runs your Python script.
+5. Click the "Edit" button to modify the action.
+6. In the "Edit Action" window, locate the "Program/script" field.
+7. Instead of specifying just the path to the Python script, provide the full path to the Python interpreter within the virtual environment.
+
+For example, if your virtual environment is located at `C:\path\to\myenv`, and the Python script you want to run is `C:\path\to\myscript.py`, you would update the "Program/script" field to be:
+
+```
+C:\path\to\myenv\Scripts\python.exe
+```
+
+8. In the "Add arguments" field, provide the path to your Python script:
+
+```
+C:\path\to\myscript.py
+```
+
+9. Click "OK" to save the changes.
+
+By specifying the full path to the Python interpreter within the virtual environment, the Task Scheduler will activate the virtual environment before executing your Python script.
+
+Make sure to adjust the paths in the instructions above according to your specific environment and script locations.

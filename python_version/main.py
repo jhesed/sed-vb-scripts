@@ -1,31 +1,19 @@
-import logging
+import time
 from datetime import datetime, timedelta
-from logging.handlers import TimedRotatingFileHandler
 
 import pytz
 import win32com.client
 
-from python_version.config import CONN_STRING, DB_CONN_TYPE, DB_COMMAND, TAGS
-
-# Configure logging
-log_filename = "pl-data-miner.log"
-max_file_size = 1 * 1024 * 1024  # 1 MB
-backup_count = 5  # Number of backup log files to keep
-log_interval = 60  # Log rotation interval in seconds
-
-# Create a timed rotating file handler
-file_handler = TimedRotatingFileHandler(
-    log_filename, when="midnight", interval=1, backupCount=backup_count
+from python_version.config import (
+    CONN_STRING,
+    DB_CONN_TYPE,
+    DB_COMMAND,
+    TAGS,
+    DELAY,
 )
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(
-    logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
-)
+from python_version.logger import instantiate_logger
 
-# Create a logger and add the file handler
-logger = logging.getLogger("task_logger")
-logger.setLevel(logging.INFO)
-logger.addHandler(file_handler)
+logger = instantiate_logger()
 
 
 class ScadaClient:
@@ -108,6 +96,9 @@ class ScadaClient:
 
 
 if __name__ == "__main__":
+    # Let's wait for Scada to finish its execution first
+    time.sleep(DELAY)
+
     # Get current datetime in UTC (scada time)
     current_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
 
