@@ -1,10 +1,31 @@
-import json
+import logging
 from datetime import datetime, timedelta
+from logging.handlers import TimedRotatingFileHandler
 
 import pytz
 import win32com.client
 
 from python_version.config import CONN_STRING, DB_CONN_TYPE, DB_COMMAND, TAGS
+
+# Configure logging
+log_filename = "pl-data-miner.log"
+max_file_size = 1 * 1024 * 1024  # 1 MB
+backup_count = 5  # Number of backup log files to keep
+log_interval = 60  # Log rotation interval in seconds
+
+# Create a timed rotating file handler
+file_handler = TimedRotatingFileHandler(
+    log_filename, when="midnight", interval=1, backupCount=backup_count
+)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
+)
+
+# Create a logger and add the file handler
+logger = logging.getLogger("task_logger")
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
 
 
 class ScadaClient:
@@ -99,8 +120,13 @@ if __name__ == "__main__":
     ]
     next_minute_str = next_minute.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
-    print(f"current_datetime_str: {current_datetime_str}")
-    print(f"next_minute_str: {next_minute_str}")
+    logger.info(
+        {
+            "msg": "Alive.",
+            "current_datetime_str": current_datetime_str,
+            "next_minute_str": next_minute_str,
+        }
+    )
 
     scada_client = ScadaClient()
     result = scada_client(
@@ -109,5 +135,5 @@ if __name__ == "__main__":
         start_datetime=current_datetime_str,
         end_datetime=next_minute_str,
     )
-    print(json.dumps(result, indent=2))
+    logger.info({"msg": "Got data.", "data": result})
     scada_client.close_connection()
