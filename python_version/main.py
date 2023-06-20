@@ -22,6 +22,7 @@ from python_version.config import (
     TAGS,
     DELAY,
     REPORT_RANGE_MINS,
+    PLANT_ID,
 )
 from python_version.logger import instantiate_logger
 
@@ -34,20 +35,41 @@ class ScadaClient:
 
     def __call__(
         self, tags: list, archive_name: str, start_datetime: str, end_datetime
-    ):
-        self.merged_result = {}
+    ) -> list:
+        self.initial_results = {}
 
-        for tag in tags:
-            self.build_command_text(
-                tag=tag,
-                archive_name=archive_name,
-                start_datetime=start_datetime,
-                end_datetime=end_datetime,
+        try:
+            for tag in tags:
+                self.build_command_text(
+                    tag=tag,
+                    archive_name=archive_name,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                )
+                self.build_command()
+                result = self.get_values(tag=tag)
+
+            return self.listify_dict(result)
+        except Exception as exc:
+            logger.exception({"msg": f"Got unexpected error: {str(exc)}"})
+
+    @staticmethod
+    def listify_dict(items: dict):
+        """
+        Expected format:
+            {
+                <some_date>: {...}
+            }
+        """
+        listified_dict = []
+        for date_and_time, values in items.items():
+            listified_dict.append(
+                {
+                    "scada_datetime": date_and_time,
+                    **values,
+                }
             )
-            self.build_command()
-            result = self.get_values(tag=tag)
-
-        return result
+        return listified_dict
 
     @staticmethod
     def get_connection(connection_string: str = CONN_STRING):
@@ -94,14 +116,14 @@ class ScadaClient:
                 "%Y-%m-%d %H:%M:%S"
             )
 
-            if formatted_date not in self.merged_result:
-                self.merged_result[formatted_date] = {}
+            if formatted_date not in self.initial_results:
+                self.initial_results[formatted_date] = {"plant_id": PLANT_ID}
 
-            self.merged_result[formatted_date][tag] = rect_set.Fields(
-                "RealValue"
-            ).Value
+            self.initial_results[formatted_date][
+                tag.lower()
+            ] = rect_set.Fields("RealValue").Value
             rect_set.MoveNext()
-        return self.merged_result
+        return self.initial_results
 
     def close_connection(self):
         self.connection.Close()

@@ -18,3 +18,6 @@ DELAY = int(os.getenv("DELAY", 1))
 
 # Used for end datetime of report
 REPORT_RANGE_MINS = 5
+
+# Assign unique value per plant!!!
+PLANT_ID = 1
