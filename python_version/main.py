@@ -1,14 +1,9 @@
+# Get the current script directory
 import os
 import sys
 import time
 from datetime import datetime, timedelta
 
-import pytz
-import win32com.client
-
-from python_version.api import api_create_ops
-
-# Get the current script directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Get the parent directory of the script directory
@@ -17,6 +12,10 @@ parent_dir = os.path.dirname(script_dir)
 # Add the parent directory to the Python path
 sys.path.append(parent_dir)
 
+import pytz
+import win32com.client
+
+from python_version.api import api_create_ops
 from python_version.config import (
     CONN_STRING,
     DB_CONN_TYPE,
@@ -25,6 +24,7 @@ from python_version.config import (
     DELAY,
     REPORT_RANGE_MINS,
     PLANT_ID,
+    ARCHIVE_TABLE_NAME,
 )
 from python_version.logger import instantiate_logger
 
@@ -52,9 +52,13 @@ class ScadaClient:
                 result = self.get_values(tag=tag)
 
             listified = self.listify_dict(result)
-            api_response = api_create_ops(data_list=listified)
+            status_code, status_text = api_create_ops(data_list=listified)
             logger.info(
-                {"msg": "Got API response", "api_response": api_response}
+                {
+                    "msg": "Got API response",
+                    "status_code": status_code,
+                    "status_text": status_text,
+                }
             )
             return listified
         except Exception as exc:
@@ -160,7 +164,7 @@ if __name__ == "__main__":
     scada_client = ScadaClient()
     result = scada_client(
         tags=TAGS,
-        archive_name="Hourly",
+        archive_name=ARCHIVE_TABLE_NAME,
         start_datetime=start_datetime_str,
         end_datetime=end_datetime_str,
     )
