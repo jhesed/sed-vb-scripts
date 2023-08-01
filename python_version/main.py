@@ -52,6 +52,12 @@ class ScadaClient:
                 result = self.get_values(tag=tag)
 
             listified = self.listify_dict(result)
+            logger.info(
+                {
+                    "msg": "Retrieved from scada",
+                    "listified": listified,
+                }
+            )
             status_code, status_text = api_create_ops(data_list=listified)
             logger.info(
                 {
