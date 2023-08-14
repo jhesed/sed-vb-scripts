@@ -80,12 +80,15 @@ class ScadaClient:
         """
         listified_dict = []
         for date_and_time, values in items.items():
-            listified_dict.append(
-                {
-                    "scada_datetime": date_and_time,
-                    **values,
-                }
-            )
+            for key, value in values.items():
+                listified_dict.append(
+                    {
+                        "scada_datetime": date_and_time,
+                        "plant_id": PLANT_ID,
+                        "key": key,
+                        "value": value,
+                    }
+                )
         return listified_dict
 
     @staticmethod
@@ -133,11 +136,11 @@ class ScadaClient:
             )
 
             if formatted_date not in self.initial_results:
-                self.initial_results[formatted_date] = {"plant_id": PLANT_ID}
+                self.initial_results[formatted_date] = {}
 
-            self.initial_results[formatted_date][
-                tag.lower()
-            ] = rect_set.Fields("RealValue").Value
+            self.initial_results[formatted_date][tag] = rect_set.Fields(
+                "RealValue"
+            ).Value
             rect_set.MoveNext()
         return self.initial_results
 
