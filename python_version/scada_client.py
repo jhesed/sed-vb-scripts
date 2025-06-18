@@ -69,7 +69,14 @@ class ScadaClient:
         """
         Expected format:
             {
-                <some_date>: {...}
+                <some_date1>: {
+                    "temperature": 18,
+                    "flow": 19
+                },
+                <some_date2>: {
+                    "temperature": 19,
+                    "flow": 10
+                },
             }
         """
         listified_dict = []

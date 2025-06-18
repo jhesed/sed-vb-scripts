@@ -1,0 +1,74 @@
+[
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_001",
+        "key": "TEMPERATURE",
+        "value": 31.8
+    },
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_001",
+        "key": "FLOW",
+        "value": 145.0
+    },
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_001",
+        "key": "PRESSURE",
+        "value": 2.2
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_001",
+        "key": "TEMPERATURE",
+        "value": 32.1
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_001",
+        "key": "FLOW",
+        "value": 146.3
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_001",
+        "key": "PRESSURE",
+        "value": 2.3
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_001",
+        "key": "TEMPERATURE",
+        "value": 32.5
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_001",
+        "key": "FLOW",
+        "value": 144.8
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_001",
+        "key": "PRESSURE",
+        "value": 2.4
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_001",
+        "key": "TEMPERATURE",
+        "value": 33.0
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_001",
+        "key": "FLOW",
+        "value": 147.1
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_001",
+        "key": "PRESSURE",
+        "value": 2.2
+    }
+]

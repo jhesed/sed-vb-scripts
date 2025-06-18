@@ -1,0 +1,74 @@
+[
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_002",
+        "key": "TEMPERATURE",
+        "value": 30.5
+    },
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_002",
+        "key": "HUMIDITY",
+        "value": 61.2
+    },
+    {
+        "scada_datetime": "2025-06-18T08:00:00",
+        "plant_id": "PLANT_002",
+        "key": "AMMONIA_LEVEL",
+        "value": 0.15
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_002",
+        "key": "TEMPERATURE",
+        "value": 30.8
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_002",
+        "key": "HUMIDITY",
+        "value": 60.5
+    },
+    {
+        "scada_datetime": "2025-06-18T08:15:00",
+        "plant_id": "PLANT_002",
+        "key": "AMMONIA_LEVEL",
+        "value": 0.17
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_002",
+        "key": "TEMPERATURE",
+        "value": 31.1
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_002",
+        "key": "HUMIDITY",
+        "value": 59.9
+    },
+    {
+        "scada_datetime": "2025-06-18T08:30:00",
+        "plant_id": "PLANT_002",
+        "key": "AMMONIA_LEVEL",
+        "value": 0.19
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_002",
+        "key": "TEMPERATURE",
+        "value": 31.5
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_002",
+        "key": "HUMIDITY",
+        "value": 58.6
+    },
+    {
+        "scada_datetime": "2025-06-18T08:45:00",
+        "plant_id": "PLANT_002",
+        "key": "AMMONIA_LEVEL",
+        "value": 0.21
+    }
+]
