@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 import pytz
 
+from python_version.api import api_create_ops
 from python_version.config import (
     TAGS,
     DELAY,
@@ -54,9 +55,21 @@ if __name__ == "__main__":
     # Step: Transform data (modify function as necessary)
     scada_client.transform_data(scada_data)
 
+    # Step: Send to central scada which will then pass data to eventhub
+    status_code, status_text = api_create_ops(data_list=scada_data)
+    logger.info(
+        {
+            "msg": "Got API response",
+            "status_code": status_code,
+            "status_text": status_text,
+        }
+    )
     # Step: Close scada connection as it's no longer needed
     scada_client.close_connection()
 
+    """
+    Uncomment if we want to send directly to event hub instead of passing data to a central API
+    
     # Step: Establish connection to Azure event hub
     event_hub_client = EventHubClient(
         connection_string=EVENTHUB_CONN_STRING, eventhub_name=EVENTHUB_NAME
@@ -65,5 +78,6 @@ if __name__ == "__main__":
     # Step: Send scada data to Event hub
     event_hub_client.send_data_to_eventhub(data=scada_data)
     logger.info({"msg": "Done sending data to event hub", "scada_data": scada_data})
+    """
 
 
