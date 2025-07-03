@@ -1,155 +1,25 @@
-# Get the current script directory
-import os
-import sys
 import time
 from datetime import datetime, timedelta
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Get the parent directory of the script directory
-parent_dir = os.path.dirname(script_dir)
-
-# Add the parent directory to the Python path
-sys.path.append(parent_dir)
-
 import pytz
-import win32com.client
 
 from python_version.api import api_create_ops
 from python_version.config import (
-    CONN_STRING,
-    DB_CONN_TYPE,
-    DB_COMMAND,
     TAGS,
     DELAY,
     REPORT_RANGE_MINS,
-    PLANT_ID,
     ARCHIVE_TABLE_NAME,
+    SCADA_CONN_STRING,
 )
 from python_version.logger import instantiate_logger
+from python_version.scada_client import ScadaClient
 
 logger = instantiate_logger()
 
 
-class ScadaClient:
-    def __init__(self):
-        self.connection = self.get_connection()
-
-    def __call__(
-        self, tags: list, archive_name: str, start_datetime: str, end_datetime
-    ) -> list:
-        self.initial_results = {}
-
-        try:
-            for tag in tags:
-                self.build_command_text(
-                    tag=tag,
-                    archive_name=archive_name,
-                    start_datetime=start_datetime,
-                    end_datetime=end_datetime,
-                )
-                self.build_command()
-                result = self.get_values(tag=tag)
-
-            listified = self.listify_dict(result)
-            logger.info(
-                {
-                    "msg": "Retrieved from scada",
-                    "listified": listified,
-                }
-            )
-            status_code, status_text = api_create_ops(data_list=listified)
-            logger.info(
-                {
-                    "msg": "Got API response",
-                    "status_code": status_code,
-                    "status_text": status_text,
-                }
-            )
-            return listified
-        except Exception as exc:
-            logger.exception({"msg": f"Got unexpected error: {str(exc)}"})
-
-    @staticmethod
-    def listify_dict(items: dict):
-        """
-        Expected format:
-            {
-                <some_date>: {...}
-            }
-        """
-        listified_dict = []
-        for date_and_time, values in items.items():
-            for key, value in values.items():
-                listified_dict.append(
-                    {
-                        "scada_datetime": date_and_time,
-                        "plant_id": PLANT_ID,
-                        "key": key,
-                        "value": value,
-                    }
-                )
-        return listified_dict
-
-    @staticmethod
-    def get_connection(connection_string: str = CONN_STRING):
-        """Creates connection object and connect to it."""
-        conn = win32com.client.Dispatch(DB_CONN_TYPE)
-        conn.ConnectionString = connection_string
-        conn.CursorLocation = 3
-        conn.Open()
-        return conn
-
-    def build_command_text(
-        self, tag: str, archive_name: str, start_datetime: str, end_datetime
-    ):
-        """
-        # TODO: Find a more optimal way to query all tags in batch.
-        Examples:
-            :param start_datetime: 2023-06-16 10:56:00.000
-            :param end_datetime: 2023-06-16 10:57:00.000
-            :param tags: ["Flow", "Power"]
-            :param archive_name: "Hourly". Refer to wincc for available options
-        """
-
-        self.command_text = (
-            f"Tag:R,'{archive_name}\{tag}',{start_datetime},'{end_datetime}'"
-        )
-
-    def build_command(self, conn_type: str = DB_COMMAND):
-        self.command = win32com.client.Dispatch(conn_type)
-        self.command.CommandType = 1
-        self.command.ActiveConnection = self.connection
-        self.command.CommandText = self.command_text
-
-    def get_values(self, tag: str):
-        rect_set = self.command.Execute()
-        rect_set = rect_set[0]
-        while not rect_set.EOF:
-            # Convert to correct timezone
-            date_and_time_in_timezone = datetime.fromtimestamp(
-                rect_set.Fields("Timestamp").Value.timestamp()
-            )
-
-            formatted_date = date_and_time_in_timezone.strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-            if formatted_date not in self.initial_results:
-                self.initial_results[formatted_date] = {}
-
-            self.initial_results[formatted_date][tag] = rect_set.Fields(
-                "RealValue"
-            ).Value
-            rect_set.MoveNext()
-        return self.initial_results
-
-    def close_connection(self):
-        self.connection.Close()
-
-
 if __name__ == "__main__":
-    # Let's wait for Scada to finish its execution first
+
+    # Let's wait for Scada to finish its previous executions
     time.sleep(DELAY)
 
     # Get current datetime in UTC (scada time)
@@ -170,12 +40,42 @@ if __name__ == "__main__":
         }
     )
 
-    scada_client = ScadaClient()
-    result = scada_client(
+    # Step: Establish connection to local scada
+    scada_client = ScadaClient(connection_string=SCADA_CONN_STRING)
+
+    # Step: Extract data from local scada
+    scada_data = scada_client.extract_data(
         tags=TAGS,
         archive_name=ARCHIVE_TABLE_NAME,
         start_datetime=start_datetime_str,
         end_datetime=end_datetime_str,
     )
-    logger.info({"msg": "Got data.", "data": result})
+    logger.info({"msg": "Got data.", "scada_data": scada_data})
+
+    # Step: Transform data (modify function as necessary)
+    scada_client.transform_data(scada_data)
+
+    # Step: Send to central scada which will then pass data to eventhub
+    status_code, status_text = api_create_ops(data_list=scada_data)
+    logger.info(
+        {
+            "msg": "Got API response",
+            "status_code": status_code,
+            "status_text": status_text,
+        }
+    )
+    # Step: Close scada connection as it's no longer needed
     scada_client.close_connection()
+
+    """
+    Uncomment if we want to send directly to event hub instead of passing data to a central API
+    
+    # Step: Establish connection to Azure event hub
+    event_hub_client = EventHubClient(
+        connection_string=EVENTHUB_CONN_STRING, eventhub_name=EVENTHUB_NAME
+    )
+
+    # Step: Send scada data to Event hub
+    event_hub_client.send_data_to_eventhub(data=scada_data)
+    logger.info({"msg": "Done sending data to event hub", "scada_data": scada_data})
+    """
