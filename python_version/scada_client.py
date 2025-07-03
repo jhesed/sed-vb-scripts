@@ -1,4 +1,3 @@
-
 # Get the current script directory
 import os
 import sys
@@ -24,6 +23,7 @@ from python_version.config import (
 from python_version.logger import instantiate_logger
 
 logger = instantiate_logger()
+
 
 class ScadaClient:
     def __init__(self, connection_string: str):

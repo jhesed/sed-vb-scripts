@@ -5,7 +5,9 @@ from azure.eventhub import EventHubProducerClient, EventData
 
 class EventHubClient:
     def __init__(self, connection_string: str, eventhub_name: str):
-        self.producer = self.get_connection(connection_string, eventhub_name=eventhub_name)
+        self.producer = self.get_connection(
+            connection_string, eventhub_name=eventhub_name
+        )
 
     def get_connection(self, connection_string: str, eventhub_name: str):
         return EventHubProducerClient.from_connection_string(

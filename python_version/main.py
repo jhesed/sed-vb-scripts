@@ -8,9 +8,9 @@ from python_version.config import (
     TAGS,
     DELAY,
     REPORT_RANGE_MINS,
-    ARCHIVE_TABLE_NAME, EVENTHUB_CONN_STRING, EVENTHUB_NAME, SCADA_CONN_STRING,
+    ARCHIVE_TABLE_NAME,
+    SCADA_CONN_STRING,
 )
-from python_version.event_hub_client import EventHubClient
 from python_version.logger import instantiate_logger
 from python_version.scada_client import ScadaClient
 
@@ -79,5 +79,3 @@ if __name__ == "__main__":
     event_hub_client.send_data_to_eventhub(data=scada_data)
     logger.info({"msg": "Done sending data to event hub", "scada_data": scada_data})
     """
-
-
