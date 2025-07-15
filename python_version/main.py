@@ -17,8 +17,7 @@ from python_version.scada_client import ScadaClient
 logger = instantiate_logger()
 
 
-if __name__ == "__main__":
-
+def run():
     # Let's wait for Scada to finish its previous executions
     time.sleep(DELAY)
 
@@ -50,6 +49,15 @@ if __name__ == "__main__":
         start_datetime=start_datetime_str,
         end_datetime=end_datetime_str,
     )
+    if not scada_data:
+        logger.info(
+            {
+                "msg": "No data received. Not sending to centralized server",
+                "scada_data": scada_data,
+            }
+        )
+        return
+
     logger.info({"msg": "Got data.", "scada_data": scada_data})
 
     # Step: Transform data (modify function as necessary)
@@ -69,7 +77,7 @@ if __name__ == "__main__":
 
     """
     Uncomment if we want to send directly to event hub instead of passing data to a central API
-    
+
     # Step: Establish connection to Azure event hub
     event_hub_client = EventHubClient(
         connection_string=EVENTHUB_CONN_STRING, eventhub_name=EVENTHUB_NAME
@@ -79,3 +87,8 @@ if __name__ == "__main__":
     event_hub_client.send_data_to_eventhub(data=scada_data)
     logger.info({"msg": "Done sending data to event hub", "scada_data": scada_data})
     """
+
+
+if __name__ == "__main__":
+    while True:
+        run()
