@@ -148,34 +148,41 @@ class ScadaClient:
         self.connection.Close()
 
 
+def run():
+    while True:
+        # Get current datetime in UTC (scada time)
+        end_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
+
+        # Get data from the past x minutes
+        start_datetime = end_datetime - timedelta(minutes=REPORT_RANGE_MINS)
+
+        # Format the datetime strings
+        start_datetime_str = start_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[
+            :-3
+        ]
+        end_datetime_str = end_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+        logger.info(
+            {
+                "msg": "Alive.",
+                "start_datetime_str": start_datetime_str,
+                "end_datetime_str": end_datetime_str,
+            }
+        )
+
+        scada_client = ScadaClient()
+        result = scada_client(
+            tags=TAGS,
+            archive_name=ARCHIVE_TABLE_NAME,
+            start_datetime=start_datetime_str,
+            end_datetime=end_datetime_str,
+        )
+        logger.info({"msg": "Got data.", "data": result})
+        scada_client.close_connection()
+
+        # Let's wait for Scada to finish its execution first
+        time.sleep(DELAY)
+
+
 if __name__ == "__main__":
-    # Let's wait for Scada to finish its execution first
-    time.sleep(DELAY)
-
-    # Get current datetime in UTC (scada time)
-    end_datetime = datetime.now(pytz.utc).replace(second=0, microsecond=0)
-
-    # Get data from the past x minutes
-    start_datetime = end_datetime - timedelta(minutes=REPORT_RANGE_MINS)
-
-    # Format the datetime strings
-    start_datetime_str = start_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-    end_datetime_str = end_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-
-    logger.info(
-        {
-            "msg": "Alive.",
-            "start_datetime_str": start_datetime_str,
-            "end_datetime_str": end_datetime_str,
-        }
-    )
-
-    scada_client = ScadaClient()
-    result = scada_client(
-        tags=TAGS,
-        archive_name=ARCHIVE_TABLE_NAME,
-        start_datetime=start_datetime_str,
-        end_datetime=end_datetime_str,
-    )
-    logger.info({"msg": "Got data.", "data": result})
-    scada_client.close_connection()
+    run()
